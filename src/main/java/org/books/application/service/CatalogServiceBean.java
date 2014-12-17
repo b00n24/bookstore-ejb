@@ -24,17 +24,26 @@ public class CatalogServiceBean implements CatalogService {
 
     @Override
     public Book findBook(Long bookId) throws BookNotFoundException {
-	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	Book book = bookRepository.findById(bookId);
+	if (book == null) {
+	    throw new BookNotFoundException();
+	}
+	return book;
     }
 
     @Override
     public Book findBook(String isbn) throws BookNotFoundException {
-	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	Book book = bookRepository.findByISBN(isbn);
+	if (book == null) {
+	    throw new BookNotFoundException();
+	}
+	return book;
     }
 
     @Override
     public List<Book> searchBooks(String keywords) {
-	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	List<Book> books = bookRepository.searchBooks(keywords);
+	return books;
     }
 
 }
