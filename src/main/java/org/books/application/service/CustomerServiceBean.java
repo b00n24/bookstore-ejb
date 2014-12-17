@@ -11,6 +11,7 @@ import org.books.application.exception.EmailAlreadyUsedException;
 import org.books.application.exception.InvalidCredentialsException;
 import org.books.persistence.dto.CustomerInfo;
 import org.books.persistence.entity.Customer;
+import org.books.persistence.entity.Login;
 import org.books.persistence.service.CustomerRepository;
 
 @Stateless(name = "CustomerService")
@@ -27,37 +28,74 @@ public class CustomerServiceBean implements CustomerService {
 
     @Override
     public void authenticateCustomer(String email, String password) throws InvalidCredentialsException {
-	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	try {
+	    Login login = customerRepository.findLoginByUserName(email);
+	    if (!login.getPassword().equals(password)) {
+		throw new InvalidCredentialsException();
+	    }
+	} catch (Exception ex) {
+	    // Bewusst keine null-Checks, da ich bei einem Fehler sowieso hier lande und dem Benutzer keine genaueren Infos gebe.
+	    throw new InvalidCredentialsException();
+	}
     }
 
     @Override
     public void changePassword(String email, String password) throws CustomerNotFoundException {
-	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	Customer customer = customerRepository.findByMail(email);
+	checkCustomerFound(customer);
+	Login login = customerRepository.findLoginByUserName(email);
+	login.setPassword(password);
+	customerRepository.update(login);
     }
 
     @Override
     public Customer findCustomer(Long customerId) throws CustomerNotFoundException {
-	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	Customer customer = customerRepository.findCustomer(customerId);
+	return checkCustomerFound(customer);
     }
 
     @Override
     public Customer findCustomer(String email) throws CustomerNotFoundException {
-	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	Customer customer = customerRepository.findByMail(email);
+	return checkCustomerFound(customer);
+    }
+
+    private Customer checkCustomerFound(Customer customer) throws CustomerNotFoundException {
+	if (customer == null) {
+	    throw new CustomerNotFoundException();
+	}
+	return customer;
     }
 
     @Override
     public Long registerCustomer(Customer customer, String password) throws EmailAlreadyUsedException {
-	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	Customer alreadyRegisteredCustomer = customerRepository.findByMail(customer.getEmail());
+	if(alreadyRegisteredCustomer != null){
+	    throw new EmailAlreadyUsedException();
+	}
+	Login login = new Login();
+	login.setUserName(customer.getEmail());
+	login.setPassword(password);
+	customerRepository.persist(login);
+	customerRepository.persist(customer);
+	customerRepository.flush();
+	return customer.getId();
+
     }
 
     @Override
     public List<CustomerInfo> searchCustomers(String name) {
-	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	return customerRepository.searchCustomersByName(name);
     }
 
     @Override
     public void updateCustomer(Customer customer) throws CustomerNotFoundException, EmailAlreadyUsedException {
-	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	Customer foundCustomer = customerRepository.findByMail(customer.getEmail());
+	checkCustomerFound(foundCustomer);
+	if(!foundCustomer.getId().equals(customer.getId())){
+	    throw new EmailAlreadyUsedException();
+	}
+	customerRepository.update(customer);
     }
 
 }
