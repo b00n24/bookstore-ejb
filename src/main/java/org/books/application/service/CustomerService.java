@@ -2,7 +2,6 @@ package org.books.application.service;
 
 import java.util.List;
 import javax.ejb.Remote;
-import javax.ejb.Remove;
 import org.books.application.exception.CustomerNotFoundException;
 import org.books.application.exception.EmailAlreadyUsedException;
 import org.books.application.exception.InvalidCredentialsException;

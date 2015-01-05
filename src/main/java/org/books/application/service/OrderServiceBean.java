@@ -16,6 +16,7 @@ import org.books.application.exception.InvalidOrderStatusException;
 import org.books.application.exception.OrderNotFoundException;
 import org.books.application.exception.PaymentFailedException;
 import org.books.persistence.dto.OrderInfo;
+import org.books.persistence.dto.OrderItem;
 import org.books.persistence.entity.Book;
 import org.books.persistence.entity.Customer;
 import org.books.persistence.entity.LineItem;
@@ -76,29 +77,29 @@ public class OrderServiceBean implements OrderService {
     }
 
     @Override
-    public OrderInfo placeOrder(Long customerId, List<LineItem> items) throws CustomerNotFoundException, BookNotFoundException, PaymentFailedException {
+    public OrderInfo placeOrder(Long customerId, List<OrderItem> items) throws CustomerNotFoundException, BookNotFoundException, PaymentFailedException {
 	Customer customer = getCustomer(customerId);
 
+	Order order = new Order();
+	order.setAddress(customer.getAddress());
+	order.setCreditCard(customer.getCreditCard());
+	order.setCustomer(customer);
+	order.setDate(new Date());
+	// TODO Check ob anders generieren
+	order.setNumber(UUID.randomUUID().toString());
+	order.setStatus(Status.PROCESSING);
+	
 	BigDecimal amount = new BigDecimal(BigInteger.ZERO);
-	for (LineItem item : items) {
-	    Book book = bookRepository.findById(item.getBook().getId());
+	for (OrderItem item : items) {
+	    Book book = bookRepository.findByISBN(item.getIsbn());
 	    if (book == null) {
 		throw new BookNotFoundException();
 	    }
 	    BigDecimal curAmount = book.getPrice().multiply(new BigDecimal(item.getQuantity()));
 	    amount.add(curAmount);
+	    order.getItems().add(new LineItem(book, item.getQuantity()));
 	}
-
-	Order order = new Order();
-	order.setAddress(customer.getAddress());
 	order.setAmount(amount);
-	order.setCreditCard(customer.getCreditCard());
-	order.setCustomer(customer);
-	order.setDate(new Date());
-	order.getItems().addAll(items);
-	// TODO Check ob anders generieren
-	order.setNumber(UUID.randomUUID().toString());
-	order.setStatus(Status.PROCESSING);
 	orderRepository.update(order);
 	
 	//TODO payment

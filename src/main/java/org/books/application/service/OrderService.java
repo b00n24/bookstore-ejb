@@ -7,7 +7,7 @@ import org.books.application.exception.InvalidOrderStatusException;
 import org.books.application.exception.OrderNotFoundException;
 import org.books.application.exception.PaymentFailedException;
 import org.books.persistence.dto.OrderInfo;
-import org.books.persistence.entity.LineItem;
+import org.books.persistence.dto.OrderItem;
 import org.books.persistence.entity.Order;
 
 /**
@@ -60,7 +60,7 @@ public interface OrderService {
      * @throws PaymentFailedException if an error occurs during the credit card
      * payment
      */
-    OrderInfo placeOrder(Long customerId, List<LineItem> items) throws CustomerNotFoundException, BookNotFoundException, PaymentFailedException;
+    OrderInfo placeOrder(Long customerId, List<OrderItem> items) throws CustomerNotFoundException, BookNotFoundException, PaymentFailedException;
 
     /**
      * Searches for orders of a particular customer and year.
