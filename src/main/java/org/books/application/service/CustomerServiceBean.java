@@ -50,7 +50,7 @@ public class CustomerServiceBean implements CustomerService {
 
     @Override
     public Customer findCustomer(Long customerId) throws CustomerNotFoundException {
-	Customer customer = customerRepository.findCustomer(customerId);
+	Customer customer = customerRepository.findById(customerId);
 	return checkCustomerFound(customer);
     }
 
