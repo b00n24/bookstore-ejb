@@ -50,10 +50,10 @@ public class OrderServiceBean implements OrderService {
     public void cancelOrder(Long orderId) throws OrderNotFoundException, InvalidOrderStatusException {
 	// TODO : Check ob hier getBusinessObject benutzt weden muss???
 	final Order order = findOrder(orderId);
-	if (order.getStatus() == Status.DELIVERED) {
+	if (order.getStatus() == Status.shipped) {
 	    throw new InvalidOrderStatusException();
 	}
-	order.setStatus(Status.CANCELED);
+	order.setStatus(Status.canceled);
 
 	orderRepository.update(order);
     }
@@ -87,7 +87,7 @@ public class OrderServiceBean implements OrderService {
 	order.setDate(new Date());
 	// TODO Check ob anders generieren
 	order.setNumber(UUID.randomUUID().toString());
-	order.setStatus(Status.PROCESSING);
+	order.setStatus(Status.processing);
 	
 	BigDecimal amount = new BigDecimal(BigInteger.ZERO);
 	for (OrderItem item : items) {
