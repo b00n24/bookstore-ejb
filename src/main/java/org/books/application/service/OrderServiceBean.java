@@ -72,6 +72,7 @@ public class OrderServiceBean implements OrderService {
 	order.setStatus(Status.canceled);
 
 	orderRepository.update(order);
+	mailBean.sendMailOrderChanged(order);
     }
 
     @Override
@@ -116,14 +117,10 @@ public class OrderServiceBean implements OrderService {
 	}
 	order.setAmount(amount);
 	orderRepository.update(order);
-	try {
-	    mailBean.sendMail(order.getCustomer().getEmail(), "Order Status changed", 
-		    "Your order status changed to accepted for order " + order.getNumber());
-	} catch (MessagingException ex) {
-	    Logger.getLogger(OrderServiceBean.class.getName()).log(Level.WARNING, "Could not send email", ex);
-	}
+	mailBean.sendMailOrderChanged(order);
 
 	// Put order in orderQueue
+	// We put a MapMessage, because we want the flexibility to add more values in future
 	MapMessage message = jmsContext.createMapMessage();
 	try {
 	    message.setLong("orderId", order.getId());
