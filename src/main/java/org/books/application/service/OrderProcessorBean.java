@@ -39,8 +39,10 @@ public class OrderProcessorBean implements MessageListener {
     private TimerService timerService;
     @Inject
     private MailBean mailBean;
+    @Resource(name = "simulatedProcessingTimeInMillis")
+    private Long simulatedProcessingTimeInMillis;
 
-    private static final Long SIMULATED_PROCESSING_TIME_IN_MILLIS = 60 * 1000L;
+//    private static final Long SIMULATED_PROCESSING_TIME_IN_MILLIS = 60 * 1000L;
     private static final String PARAM_ORDER_ID = "orderId";
     private static final Logger LOGGER = Logger.getLogger(OrderProcessorBean.class.getName());
 
@@ -67,7 +69,7 @@ public class OrderProcessorBean implements MessageListener {
 		LOGGER.log(Level.SEVERE, "Could not process order with orderId " + orderId, ex);
 	    }
 
-	    timerService.createSingleActionTimer(SIMULATED_PROCESSING_TIME_IN_MILLIS,
+	    timerService.createSingleActionTimer(simulatedProcessingTimeInMillis,
 		    new TimerConfig(orderId, true));
 	}
     }
