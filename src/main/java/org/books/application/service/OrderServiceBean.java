@@ -5,8 +5,17 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.jms.JMSConnectionFactory;
+import javax.jms.JMSContext;
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
+import javax.jms.Queue;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
@@ -38,6 +47,11 @@ public class OrderServiceBean implements OrderService {
     private OrderRepository orderRepository;
     private CustomerRepository customerRepository;
     private BookRepository bookRepository;
+    @Inject
+    @JMSConnectionFactory("jms/orderQueueFactory")
+    private JMSContext jmsContext;
+    @Resource(lookup = "jms/orderQueue")
+    private Queue orderQueue;
 
     @PostConstruct
     public void initialize() {
@@ -48,7 +62,6 @@ public class OrderServiceBean implements OrderService {
 
     @Override
     public void cancelOrder(Long orderId) throws OrderNotFoundException, InvalidOrderStatusException {
-	// TODO : Check ob hier getBusinessObject benutzt weden muss???
 	final Order order = findOrder(orderId);
 	if (order.getStatus() == Status.shipped) {
 	    throw new InvalidOrderStatusException();
@@ -85,10 +98,9 @@ public class OrderServiceBean implements OrderService {
 	order.setCreditCard(customer.getCreditCard());
 	order.setCustomer(customer);
 	order.setDate(new Date());
-	// TODO Check ob anders generieren
 	order.setNumber(UUID.randomUUID().toString());
-	order.setStatus(Status.processing);
-	
+	order.setStatus(Status.accepted);
+
 	BigDecimal amount = new BigDecimal(BigInteger.ZERO);
 	for (OrderItem item : items) {
 	    Book book = bookRepository.findByISBN(item.getIsbn());
@@ -101,9 +113,16 @@ public class OrderServiceBean implements OrderService {
 	}
 	order.setAmount(amount);
 	orderRepository.update(order);
-	
-	//TODO payment
-	
+
+	// Put order in orderQueue
+	MapMessage message = jmsContext.createMapMessage();
+	try {
+	    message.setLong("orderId", order.getId());
+	    jmsContext.createProducer().send(orderQueue, message);
+	} catch (JMSException ex) {
+	    Logger.getLogger(OrderServiceBean.class.getName()).log(Level.SEVERE, "Could not put order in processing queue", ex);
+	}
+	// PaymentFailedException will be used when we work with paypal
 	OrderInfo orderInfo = new OrderInfo(customerId, order.getNumber(), order.getDate(), order.getAmount(), order.getStatus());
 	return orderInfo;
     }
