@@ -16,6 +16,7 @@ import javax.jms.JMSContext;
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Queue;
+import javax.mail.MessagingException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
@@ -52,6 +53,8 @@ public class OrderServiceBean implements OrderService {
     private JMSContext jmsContext;
     @Resource(lookup = "jms/orderQueue")
     private Queue orderQueue;
+    @Inject
+    private MailBean mailBean;
 
     @PostConstruct
     public void initialize() {
@@ -113,6 +116,12 @@ public class OrderServiceBean implements OrderService {
 	}
 	order.setAmount(amount);
 	orderRepository.update(order);
+	try {
+	    mailBean.sendMail(order.getCustomer().getEmail(), "Order Status changed", 
+		    "Your order status changed to accepted for order " + order.getNumber());
+	} catch (MessagingException ex) {
+	    Logger.getLogger(OrderServiceBean.class.getName()).log(Level.WARNING, "Could not send email", ex);
+	}
 
 	// Put order in orderQueue
 	MapMessage message = jmsContext.createMapMessage();

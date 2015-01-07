@@ -10,10 +10,12 @@ import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerConfig;
 import javax.ejb.TimerService;
+import javax.inject.Inject;
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import javax.mail.MessagingException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
@@ -35,6 +37,8 @@ public class OrderProcessorBean implements MessageListener {
     private EntityManager em;
     @Resource
     private TimerService timerService;
+    @Inject
+    private MailBean mailBean;
 
     private static final Long SIMULATED_PROCESSING_TIME_IN_MILLIS = 60 * 1000L;
     private static final String PARAM_ORDER_ID = "orderId";
@@ -58,11 +62,13 @@ public class OrderProcessorBean implements MessageListener {
 		LOGGER.log(Level.FINE, "Setting status to processing for orderId {0}", orderId);
 		order.setStatus(Status.processing);
 		orderRepository.update(order);
+		sendMail(order);
 	    } catch (JMSException ex) {
 		LOGGER.log(Level.SEVERE, "Could not process order with orderId " + orderId, ex);
 	    }
 
-	    timerService.createSingleActionTimer(SIMULATED_PROCESSING_TIME_IN_MILLIS, new TimerConfig(orderId, true));
+	    timerService.createSingleActionTimer(SIMULATED_PROCESSING_TIME_IN_MILLIS,
+		    new TimerConfig(orderId, true));
 	}
     }
 
@@ -76,11 +82,21 @@ public class OrderProcessorBean implements MessageListener {
 		LOGGER.log(Level.FINE, "Setting status to shipped for orderId {0}", orderId);
 		order.setStatus(Status.shipped);
 		orderRepository.update(order);
+		sendMail(order);
 	    } else {
 		LOGGER.log(Level.WARNING, "Invalid order status for orderId {0}. Status is set to {1}", new Object[]{orderId, order.getStatus()});
 	    }
 	} else {
 	    throw new IllegalArgumentException();
+	}
+    }
+
+    private void sendMail(final Order order) {
+	try {
+	    mailBean.sendMail(order.getCustomer().getEmail(), "Order Status changed",
+		    "Your order status changed to " + order.getStatus() + " for order " + order.getNumber());
+	} catch (MessagingException ex) {
+	    Logger.getLogger(OrderServiceBean.class.getName()).log(Level.WARNING, "Could not send email", ex);
 	}
     }
 
