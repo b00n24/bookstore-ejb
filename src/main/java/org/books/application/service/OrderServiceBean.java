@@ -27,7 +27,9 @@ import org.books.application.exception.OrderNotFoundException;
 import org.books.application.exception.PaymentFailedException;
 import org.books.persistence.dto.OrderInfo;
 import org.books.persistence.dto.OrderItem;
+import org.books.persistence.entity.Address;
 import org.books.persistence.entity.Book;
+import org.books.persistence.entity.CreditCard;
 import org.books.persistence.entity.Customer;
 import org.books.persistence.entity.LineItem;
 import org.books.persistence.entity.Order;
@@ -98,8 +100,11 @@ public class OrderServiceBean implements OrderService {
 	Customer customer = getCustomer(customerId);
 
 	Order order = new Order();
-	order.setAddress(customer.getAddress());
-	order.setCreditCard(customer.getCreditCard());
+	Address a = customer.getAddress();
+	order.setAddress(new Address(a.getStreet(), a.getCity(), a.getPostalCode(), a.getCountry()));
+	
+	CreditCard cc = customer.getCreditCard();
+	order.setCreditCard(new CreditCard(cc.getType(), cc.getNumber(), cc.getExpirationMonth(), cc.getExpirationYear()));
 	order.setCustomer(customer);
 	order.setDate(new Date());
 	order.setNumber(UUID.randomUUID().toString());
@@ -116,7 +121,7 @@ public class OrderServiceBean implements OrderService {
 	    order.getItems().add(new LineItem(book, item.getQuantity()));
 	}
 	order.setAmount(amount);
-	orderRepository.update(order);
+	orderRepository.persist(order);
 	mailBean.sendMailOrderChanged(order);
 
 	// Put order in orderQueue
