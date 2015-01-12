@@ -1,6 +1,7 @@
 package org.books.application.service;
 
 import java.util.List;
+import javax.ejb.Remote;
 import org.books.application.exception.BookNotFoundException;
 import org.books.application.exception.CustomerNotFoundException;
 import org.books.application.exception.InvalidOrderStatusException;
@@ -14,6 +15,7 @@ import org.books.persistence.entity.Order;
  *
  * @author AWy
  */
+@Remote
 public interface OrderService {
 
     /**
