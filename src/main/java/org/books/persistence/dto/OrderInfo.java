@@ -9,7 +9,7 @@ import org.books.persistence.enums.Status;
  *
  * @author AWy
  */
-public class OrderInfo implements Serializable{
+public class OrderInfo implements Serializable {
 
     private Long id;
     private String number;
@@ -24,7 +24,7 @@ public class OrderInfo implements Serializable{
 	this.amount = amount;
 	this.status = status;
     }
-    
+
     public Long getId() {
 	return id;
     }
