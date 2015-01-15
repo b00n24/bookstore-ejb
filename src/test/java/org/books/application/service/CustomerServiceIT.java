@@ -126,16 +126,6 @@ public class CustomerServiceIT {
     }
 
     @Test
-    public void searchCustomers() throws CustomerNotFoundException {
-	// WHEN
-	List<CustomerInfo> result = service.searchCustomers("simpson");
-
-	// THEN
-	Assert.assertNotNull(result);
-	Assert.assertEquals(2, result.size());
-    }
-
-    @Test
     public void registerCustomer() throws EmailAlreadyUsedException, CustomerNotFoundException {
 	// GIVEN
 	Address address = new Address("street", "city", "postalCode", "country");
@@ -148,5 +138,75 @@ public class CustomerServiceIT {
 	// THEN
 	Customer findCustomer = service.findCustomer(result);
 	Assert.assertNotNull(findCustomer);
+    }
+
+    @Test(expectedExceptions = EmailAlreadyUsedException.class)
+    public void registerCustomer_emailAlreadyUsed() throws EmailAlreadyUsedException {
+	// GIVEN
+	Address address = new Address("street", "city", "postalCode", "country");
+	CreditCard cc = new CreditCard(Type.Visa, "77757484848", 4, 2018);
+	Customer newCustomer = new Customer("firstname", "lastname", EMAIL, address, cc);
+
+	// WHEN
+	service.registerCustomer(newCustomer, "newPass");
+    }
+
+    @Test
+    public void searchCustomers() {
+	// WHEN
+	List<CustomerInfo> result = service.searchCustomers("simpson");
+
+	// THEN
+	Assert.assertNotNull(result);
+	Assert.assertEquals(2, result.size());
+    }
+
+    @Test
+    public void searchCustomers_notExisting() {
+	// WHEN
+	List<CustomerInfo> result = service.searchCustomers("notexisting");
+
+	// THEN
+	Assert.assertNotNull(result);
+	Assert.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void updateCustomer() throws CustomerNotFoundException, EmailAlreadyUsedException {
+	// GIVEN
+	Customer customer = service.findCustomer(ID);
+	final String oldFirstname = customer.getFirstName();
+
+	// WHEN
+	customer.setFirstName("newFirstname");
+	service.updateCustomer(customer);
+
+	// THEN
+	Customer updated = service.findCustomer(ID);
+	Assert.assertEquals("newFirstname", updated.getFirstName());
+
+	// Revert
+	customer.setFirstName(oldFirstname);
+	service.updateCustomer(customer);
+    }
+
+    @Test(expectedExceptions = CustomerNotFoundException.class)
+    public void updateCustomer_nonExistingCustomer() throws CustomerNotFoundException, EmailAlreadyUsedException {
+	// GIVEN
+	Customer customer = new Customer();
+	customer.setEmail("nonExisting");
+
+	// WHEN
+	service.updateCustomer(customer);
+    }
+
+    @Test(expectedExceptions = EmailAlreadyUsedException.class)
+    public void updateCustomer_putSameEmailThanExistingCustomer() throws CustomerNotFoundException, EmailAlreadyUsedException {
+	// GIVEN
+	Customer customer = service.findCustomer(ID);
+
+	// WHEN
+	customer.setEmail("john@miller.com");
+	service.updateCustomer(customer);
     }
 }

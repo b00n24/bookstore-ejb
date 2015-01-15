@@ -1,5 +1,7 @@
 package org.books.application.service;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import javax.naming.InitialContext;
@@ -66,40 +68,6 @@ public class OrderServiceIT {
     }
 
     @Test
-    public void findOrderById() throws OrderNotFoundException, InvalidOrderStatusException {
-	// WHEN
-	Order result = service.findOrder(ORDER_ID);
-
-	// THEN
-	Assert.assertNotNull(result);
-    }
-
-    @Test
-    public void findOrderByOrderNumber() throws OrderNotFoundException, InvalidOrderStatusException {
-	// WHEN
-	Order result = service.findOrder(ORDER_NUMBER);
-
-	// THEN
-	Assert.assertNotNull(result);
-    }
-
-    @Test
-    public void placeOrder() throws CustomerNotFoundException, BookNotFoundException, PaymentFailedException, NamingException {
-	List<OrderItem> orderItems = new LinkedList();
-	OrderItem orderItem = new OrderItem();
-	orderItem.setIsbn(ISBN);
-	orderItem.setQuantity(1);
-	orderItems.add(orderItem);
-
-	// WHEN
-	OrderInfo order = service.placeOrder(CUSTOMER_ID, orderItems);
-
-	// THEN
-	createdOrderNmber = order.getNumber();
-	Assert.assertNotNull(createdOrderNmber);
-    }
-
-    @Test
     public void cancelOrder() throws OrderNotFoundException, InvalidOrderStatusException {
 	// WHEN
 	service.cancelOrder(ORDER_ID);
@@ -151,5 +119,66 @@ public class OrderServiceIT {
     public void cancelOrder_statusCanceled_invalidStatus() throws OrderNotFoundException, InvalidOrderStatusException {
 	// WHEN
 	service.cancelOrder(4l);
+    }
+    
+    @Test
+    public void findOrderById() throws OrderNotFoundException {
+	// WHEN
+	Order result = service.findOrder(ORDER_ID);
+
+	// THEN
+	Assert.assertNotNull(result);
+    }
+    
+    @Test(expectedExceptions = OrderNotFoundException.class)
+    public void findOrderById_wrongId() throws OrderNotFoundException {
+	// WHEN
+	service.findOrder(3332l);
+    }
+
+    @Test
+    public void findOrderByOrderNumber() throws OrderNotFoundException {
+	// WHEN
+	Order result = service.findOrder(ORDER_NUMBER);
+
+	// THEN
+	Assert.assertNotNull(result);
+    }
+    
+    @Test(expectedExceptions = OrderNotFoundException.class)
+    public void findOrderByOrderNumber_wrongNumber() throws OrderNotFoundException {
+	// WHEN
+	service.findOrder("543434ss");
+    }
+    
+    @Test
+    public void placeOrder() throws CustomerNotFoundException, BookNotFoundException, PaymentFailedException, NamingException {
+	List<OrderItem> orderItems = new LinkedList();
+	OrderItem orderItem = new OrderItem();
+	orderItem.setIsbn(ISBN);
+	orderItem.setQuantity(1);
+	orderItems.add(orderItem);
+
+	// WHEN
+	OrderInfo order = service.placeOrder(CUSTOMER_ID, orderItems);
+
+	// THEN
+	createdOrderNmber = order.getNumber();
+	Assert.assertNotNull(createdOrderNmber);
+    }
+    
+    @Test
+    public void searchOrders_shouldFind2() throws CustomerNotFoundException {
+	// WHEN
+	final List<OrderInfo> result = service.searchOrders(CUSTOMER_ID, 2015);
+	
+	// THEN
+	Assert.assertNotNull(result);
+	Assert.assertEquals(2, result.size());
+	Calendar cal = Calendar.getInstance();
+	cal.setTime(result.get(0).getDate());
+	Assert.assertEquals(2015, cal.get(Calendar.YEAR));
+	cal.setTime(result.get(1).getDate());
+	Assert.assertEquals(2015, cal.get(Calendar.YEAR));
     }
 }

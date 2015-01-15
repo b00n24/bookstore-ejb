@@ -1,6 +1,7 @@
 package org.books.application.service;
 
 import java.util.List;
+import javax.ejb.EJBException;
 import javax.naming.InitialContext;
 import junit.framework.Assert;
 import org.books.application.exception.BookNotFoundException;
@@ -58,6 +59,12 @@ public class CatalogServiceIT {
 	Assert.assertNotNull(result);
     }
 
+    @Test(expectedExceptions = BookNotFoundException.class)
+    public void findBookById_wrongId() throws BookNotFoundException {
+	// WHEN
+	service.findBook(345345l);
+    }
+
     @Test
     public void findBookByIsbn() throws BookNotFoundException {
 	// WHEN
@@ -67,13 +74,41 @@ public class CatalogServiceIT {
 	Assert.assertNotNull(result);
     }
 
+    @Test(expectedExceptions = BookNotFoundException.class)
+    public void findBookByIsbn_wrongIsbn() throws BookNotFoundException {
+	// WHEN
+	service.findBook("99dasd898384834");
+    }
+
     @Test
-    public void findBookByKeywords() throws BookNotFoundException {
+    public void searchBooks() throws BookNotFoundException {
 	// WHEN
 	List<Book> result = service.searchBooks(KEYWORDS);
 
 	// THEN
 	Assert.assertNotNull(result);
 	Assert.assertFalse(result.isEmpty());
+    }
+
+    @Test
+    public void searchBooks_wrongKeyword() throws BookNotFoundException {
+	// WHEN
+	List<Book> result = service.searchBooks("hhhhhhhhhhhhhhhh");
+
+	// THEN
+	Assert.assertNotNull(result);
+	Assert.assertTrue(result.isEmpty());
+    }
+
+    @Test(expectedExceptions = EJBException.class)
+    public void searchBooks_emptyKeyword() throws BookNotFoundException {
+	// WHEN
+	service.searchBooks("");
+    }
+
+    @Test(expectedExceptions = EJBException.class)
+    public void searchBooks_nullKeyword() throws BookNotFoundException {
+	// WHEN
+	service.searchBooks(null);
     }
 }
