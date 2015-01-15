@@ -46,6 +46,7 @@ public class CustomerServiceIT {
 	EntityManagerFactory emf = Persistence.createEntityManagerFactory("bookstore");
 	em = emf.createEntityManager();
 	initDatabase();
+	service = (CustomerService) new InitialContext().lookup(SERVICE_NAME);
     }
 
     private void initDatabase() throws Exception {
@@ -54,8 +55,6 @@ public class CustomerServiceIT {
 	IDataSet dataset = new FlatXmlDataSetBuilder().build(getClass().getResourceAsStream(DB_UNIT_DATASET));
 	databaseTester.setDataSet(dataset);
 	databaseTester.onSetup();
-
-	service = (CustomerService) new InitialContext().lookup(SERVICE_NAME);
     }
 
     @AfterClass

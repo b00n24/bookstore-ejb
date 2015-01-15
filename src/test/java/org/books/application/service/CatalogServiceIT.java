@@ -34,6 +34,7 @@ public class CatalogServiceIT {
     @BeforeTest
     public void setUpClass() throws Exception {
 	initDatabase();
+	service = (CatalogService) new InitialContext().lookup(SERVICE_NAME);
     }
 
     private void initDatabase() throws Exception {
@@ -42,8 +43,6 @@ public class CatalogServiceIT {
 	IDataSet dataset = new FlatXmlDataSetBuilder().build(getClass().getResourceAsStream(DB_UNIT_DATASET));
 	databaseTester.setDataSet(dataset);
 	databaseTester.onSetup();
-
-	service = (CatalogService) new InitialContext().lookup(SERVICE_NAME);
     }
 
     @AfterClass
