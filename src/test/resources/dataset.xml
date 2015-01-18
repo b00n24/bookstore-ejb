@@ -10,19 +10,33 @@
     <BOOK ID="9" ISBN="0596008732" TITLE="Learning Java (3rd Edition)" AUTHORS="Patrick Niemeyer, Jonathan Knudsen" PUBLISHER="O'Reilly" publicationYear="2005" BINDING="Paperback" numberOfPages="976" PRICE="44.95"/>
     <BOOK ID="10" ISBN="0321349806" TITLE="The Java Programming Language (4th Edition)" AUTHORS="Ken Arnold, James Gosling, David Holmes" PUBLISHER="Prentice Hall PTR" publicationYear="2005" BINDING="Paperback" numberOfPages="928" PRICE="54.99"/>
     
-    <ADDRESS id="1" street="Mainstreet" city="Springfield" postalCode="1234" country="USandA" />
-    <ADDRESS id="2" street="Mainstreet 2" city="Millertown" postalCode="666" country="Hell" />
-    <CREDITCARD id="1" type="Visa" number="1111222233334444" expirationMonth="5" expirationYear="2016" />
-    <CREDITCARD id="2" type="Mastercard" number="1111222233334444" expirationMonth="5" expirationYear="2016" />
-    <CUSTOMER id="1" firstName="Homer" lastName="Simpson" email="homer@simpson.com" address_id="1" creditCard_id="1" />
-    <CUSTOMER id="2" firstName="Marge" lastName="Simpson" email="marge@simpson.com" address_id="1" creditCard_id="1" />
-    <CUSTOMER id="3" firstName="John" lastName="Miller" email="john@miller.com" address_id="2" creditCard_id="2" />
-    <LOGIN id="1" username="homer@simpson.com" password="simpson" />
-    <LOGIN id="2" username="marge@simpson.com" password="simpson" />
-    <LOGIN id="3" username="john@miller.com" password="pass" />
+    <ADDRESS id="101" street="Mainstreet" city="Springfield" postalCode="1234" country="USandA" />
+    <ADDRESS id="102" street="Mainstreet 2" city="Millertown" postalCode="666" country="Hell" />
+    <ADDRESS id="103" street="Mainstreet 3" city="Millertown" postalCode="333" country="YO" />
     
-    <BookOrder id="1" number="111" orderDate="2012-01-01" amount="333.00" status="processing" customer_id="1" address_id="1" creditCard_id="1" />
-    <BookOrder id="2" number="222" orderDate="2013-01-01" amount="333.00" status="accepted" customer_id="1" address_id="1" creditCard_id="1" />
-    <BookOrder id="3" number="333" orderDate="2015-01-01" amount="333.00" status="shipped" customer_id="1" address_id="1" creditCard_id="1" />
-    <BookOrder id="4" number="444" orderDate="2015-01-01" amount="333.00" status="canceled" customer_id="1" address_id="1" creditCard_id="1" />
+    <!-- Copies for Order -->
+    <ADDRESS id="201" street="Mainstreet" city="Springfield" postalCode="1234" country="USandA" />
+    <ADDRESS id="202" street="Mainstreet 2" city="Millertown" postalCode="666" country="Hell" />
+    <ADDRESS id="203" street="Mainstreet 3" city="Millertown" postalCode="333" country="YO" />
+     
+    <!-- Copies for Order -->   
+    <CREDITCARD id="201" type="Visa" number="1111222233334444" expirationMonth="5" expirationYear="2016" />
+    <CREDITCARD id="202" type="MasterCard" number="1111222233334444" expirationMonth="5" expirationYear="2016" />
+    <CREDITCARD id="203" type="MasterCard" number="1111222233334444" expirationMonth="5" expirationYear="2016" />
+    
+    <CREDITCARD id="101" type="Visa" number="1111222233334444" expirationMonth="5" expirationYear="2016" />
+    <CREDITCARD id="102" type="MasterCard" number="1111222233334444" expirationMonth="5" expirationYear="2016" />
+    <CREDITCARD id="103" type="MasterCard" number="1111222233334444" expirationMonth="5" expirationYear="2016" />
+            
+    <CUSTOMER id="101" firstName="Homer" lastName="Simpson" email="homer@simpson.com" address_id="101" creditCard_id="101" />
+    <CUSTOMER id="102" firstName="Marge" lastName="Simpson" email="marge@simpson.com" address_id="102" creditCard_id="102" />
+    <CUSTOMER id="103" firstName="John" lastName="Miller" email="john@miller.com" address_id="103" creditCard_id="103" />
+    <LOGIN id="101" username="homer@simpson.com" password="simpson" />
+    <LOGIN id="102" username="marge@simpson.com" password="simpson" />
+    <LOGIN id="103" username="john@miller.com" password="pass" />
+    
+    <BookOrder id="101" number="111" orderDate="2013-01-01" amount="333.00" status="processing" customer_id="101" address_id="201" creditCard_id="201" />
+    <BookOrder id="102" number="222" orderDate="2013-01-01" amount="333.00" status="accepted" customer_id="101" address_id="202" creditCard_id="202" />
+    <BookOrder id="103" number="333" orderDate="2015-01-01" amount="333.00" status="shipped" customer_id="101" address_id="203" creditCard_id="203" />
+    <BookOrder id="104" number="444" orderDate="2015-01-01" amount="333.00" status="canceled" customer_id="101" address_id="201" creditCard_id="201" />
 </dataset>

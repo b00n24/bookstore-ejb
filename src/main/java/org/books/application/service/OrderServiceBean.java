@@ -101,14 +101,10 @@ public class OrderServiceBean implements OrderService {
 	Order order = new Order();
 	Address a = customer.getAddress();
 	Address addressCopy = new Address(a.getStreet(), a.getCity(), a.getPostalCode(), a.getCountry());
-	// TODO CHECK if necessary
-	em.persist(addressCopy);
 	order.setAddress(addressCopy);
-	
+
 	CreditCard cc = customer.getCreditCard();
 	CreditCard ccCopy = new CreditCard(cc.getType(), cc.getNumber(), cc.getExpirationMonth(), cc.getExpirationYear());
-	// TODO CHECK if necessary
-	em.persist(ccCopy);
 	order.setCreditCard(ccCopy);
 	order.setCustomer(customer);
 	order.setDate(new Date());
