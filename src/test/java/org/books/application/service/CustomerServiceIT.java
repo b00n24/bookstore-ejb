@@ -37,7 +37,7 @@ public class CustomerServiceIT {
 
     private static final String EMAIL = "homer@simpson.com";
     private static final String PASS = "simpson";
-    private static final Long ID = 101l;
+    private static final Long ID = 1l;
 
     private EntityManager em;
 

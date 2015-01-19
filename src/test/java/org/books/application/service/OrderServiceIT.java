@@ -40,8 +40,8 @@ public class OrderServiceIT {
     private EntityManager em;
 
     private static final String ISBN = "0596009208";
-    private static final Long CUSTOMER_ID = 101l;
-    private static final Long ORDER_ID = 101l;
+    private static final Long CUSTOMER_ID = 1l;
+    private static final Long ORDER_ID = 1l;
     private static final String ORDER_NUMBER = "111";
 
     @BeforeTest
@@ -86,15 +86,15 @@ public class OrderServiceIT {
     @Test
     public void cancelOrder_statusAccepted() throws OrderNotFoundException, InvalidOrderStatusException {
 	// WHEN
-	service.cancelOrder(102l);
+	service.cancelOrder(2l);
 
 	// THEN
-	Order result = service.findOrder(102l);
+	Order result = service.findOrder(2l);
 	Assert.assertEquals(Status.canceled, result.getStatus());
 
 	// Revert
 	em.getTransaction().begin();
-	Order o = service.findOrder(102l);
+	Order o = service.findOrder(2l);
 	o.setStatus(Status.accepted);
 	em.merge(o);
 	em.flush();
@@ -104,13 +104,13 @@ public class OrderServiceIT {
     @Test(expectedExceptions = InvalidOrderStatusException.class)
     public void cancelOrder_statusShipped_invalidStatus() throws OrderNotFoundException, InvalidOrderStatusException {
 	// WHEN
-	service.cancelOrder(103l);
+	service.cancelOrder(3l);
     }
 
     @Test(expectedExceptions = InvalidOrderStatusException.class)
     public void cancelOrder_statusCanceled_invalidStatus() throws OrderNotFoundException, InvalidOrderStatusException {
 	// WHEN
-	service.cancelOrder(104l);
+	service.cancelOrder(4l);
     }
 
     @Test
